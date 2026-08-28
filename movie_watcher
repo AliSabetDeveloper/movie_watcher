@@ -1,0 +1,5 @@
+#!/bin/bash
+
+for movie in ~/Videos/s9/*; do
+	mpv "$movie"
+done

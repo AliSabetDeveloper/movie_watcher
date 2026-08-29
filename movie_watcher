@@ -1,5 +1,21 @@
 #!/bin/bash
 
 for movie in ~/Videos/s9/*; do
-	mpv "$movie"
-done
+	exit_status=$(mpv "$movie" | tail -n 1)
+	if [ "$exit_status" == "Exiting... (End of file)" ]; then
+		rm "$movie"
+		echo "Do you want to see the next episode(y/n)?"; read input
+		while [[ $input != "y" && $input != "n" ]]; do
+			echo "Please enter y or n"; read input
+		done
+		case $input in
+			"y")
+			continue
+			;;
+			"n")
+			break
+		esac
+	else
+		break
+	fi
+done		

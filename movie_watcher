@@ -1,14 +1,38 @@
 #!/bin/bash
 
-for movie in ~/Videos/s9/*; do
-	exit_status=$(mpv --save-position-on-quit "$movie" | tail -n 1)
-	if [ "$exit_status" == "Exiting... (End of file)" ]; then
-		rm "$movie"
-		if [ "$(find ~/Videos/s9 -mindepth 1)" != "" ]; then
-			echo "Do you want to see the next episode(y/n)?"; read input
-			while [[ $input != "y" && $input != "n" ]]; do
-				echo "Please enter y or n"; read input
-			done
+for season in ~/Videos/*; do
+	is_watching="true"
+	for episode in "$season"/*; do
+		exit_status=$(mpv --save-position-on-quit "$episode" | tail -n 1)
+		if [ "$exit_status" == "Exiting... (End of file)" ]; then
+			rm "$episode"
+			if [ "$(find "$season" -mindepth 1)" != "" ]; then
+				echo "Do you want to see the next episode(y/n)?"; read input
+				while [[ $input != "y" && $input != "n" ]]; do
+					echo "Please enter y or n"; read input
+				done
+				case $input in
+					"y")
+					continue
+					;;
+					"n")
+					is_watching="false"
+					break
+				esac
+			else
+				rmdir "$season"
+			fi
+		else
+			is_watching="false"
+			break
+		fi
+	done
+	if [ "$(find ~/Videos -mindepth 1)" != "" ]; then
+		if [ $is_watching == "true" ]; then
+			echo "Do you want to see the next season(y/n)?"; read input
+				while [[ $input != "y" && $input != "n" ]]; do
+					echo "Please enter y or n"; read input
+				done
 			case $input in
 				"y")
 				continue
@@ -17,10 +41,8 @@ for movie in ~/Videos/s9/*; do
 				break
 			esac
 		else
-			rmdir ~/Videos/s9
+			break
 		fi
-	else
-		break
 	fi
 done
 
